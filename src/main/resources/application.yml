@@ -2,14 +2,29 @@ server:
   port: 8091
 
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-      dialect: org.hibernate.dialect.PostgreSQL81Dialect
-      format_sql: true
-    show-sql: true
 
   datasource:
     url: jdbc:postgresql://localhost:5432/justanotherapp
     username: postgres
     password: 2810
+
+  jpa:
+    hibernate:
+      ddl-auto: update       # creates/updates tables on startup
+    show-sql: true
+    properties:
+      hibernate:
+        # ✅ Fixed: dialect goes here, not under spring.jpa.hibernate
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  kafka:
+    bootstrap-servers: localhost:9092   # where your Kafka broker will run (Docker)
+    consumer:
+      group-id: justanotherapp-group
+      auto-offset-reset: earliest       # read from beginning if no offset exists
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
