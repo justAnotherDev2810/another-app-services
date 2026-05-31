@@ -19,11 +19,6 @@
         <module>another-service</module>
     </modules>
 
-    <!--
-        These go to EVERY child automatically.
-        No need to declare in any child pom.
-        Rule: 100% of services will always need these.
-    -->
     <dependencies>
 
         <dependency>
@@ -47,48 +42,6 @@
 
     </dependencies>
 
-    <!--
-        Children must opt in to these by declaring them in their own <dependencies>.
-        No version needed in the child — it comes from here.
-        Rule: not every service will need all of these.
-    -->
-    <dependencyManagement>
-        <dependencies>
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-jpa</artifactId>
-            </dependency>
-
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <scope>runtime</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.kafka</groupId>
-                <artifactId>spring-kafka</artifactId>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.kafka</groupId>
-                <artifactId>spring-kafka-test</artifactId>
-                <scope>test</scope>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
-
-    <!--
-        Plugin versions and config defined once here.
-        Children inherit this automatically — no plugin block needed in child poms.
-    -->
     <build>
         <pluginManagement>
             <plugins>
