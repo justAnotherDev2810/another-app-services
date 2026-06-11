@@ -1,6 +1,5 @@
 package com.microservice.justanotherapp.service;
 
-import com.microservice.justanotherapp.dto.AdminDto;
 import com.microservice.justanotherapp.dto.UserDto;
 
 import java.util.List;
@@ -16,4 +15,3 @@ public interface UserService {
 
     void delete(Long id);
 }
-
