@@ -2,22 +2,30 @@ package com.microservice.justanotherapp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "admins")
-@Data
+@Table(name = "users")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Admin {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String firstName;
+
+    @Column(nullable = false, unique = true)
+    private String lastName;
+
+    @Column(nullable = false, unique = true)
+    private String userName;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -33,4 +41,3 @@ public class Admin {
         if (createdAt == null) createdAt = LocalDateTime.now();
     }
 }
-
