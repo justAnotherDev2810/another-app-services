@@ -1,6 +1,6 @@
-package com.microservice.justanotherapp.dto;
+package com.microservice.job.api.dto;
 
-import com.microservice.justanotherapp.entity.User;
+import com.microservice.job.api.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +19,7 @@ public class UserDto {
     private String role;
 
     public static UserDto fromEntity(User user) {
-        if (user == null)
-            return null;
+        if (user == null) return null;
         return UserDto.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
@@ -42,3 +41,4 @@ public class UserDto {
                 .build();
     }
 }
+
