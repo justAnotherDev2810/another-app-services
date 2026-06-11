@@ -1,0 +1,23 @@
+server:
+  port: 8092   # another-service is on 8091, ingestor on 8092
+
+spring:
+  application:
+    name: ingestor-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ingestor-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+# Base URL for calling another-service
+# Change this per environment — local dev points to localhost
+clients:
+  another-service:
+    base-url: http://localhost:8091
