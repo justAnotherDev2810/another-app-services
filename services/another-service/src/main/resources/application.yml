@@ -1,8 +1,14 @@
 server:
   port: 8091
 
-spring:
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
 
+spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/justanotherapp
     username: postgres
@@ -10,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update       # creates/updates tables on startup
+      ddl-auto: update # creates/updates tables on startup
     show-sql: true
     properties:
       hibernate:
@@ -19,10 +25,10 @@ spring:
         format_sql: true
 
   kafka:
-    bootstrap-servers: localhost:9092   # where your Kafka broker will run (Docker)
+    bootstrap-servers: localhost:9092 # where your Kafka broker will run (Docker)
     consumer:
       group-id: justanotherapp-group
-      auto-offset-reset: earliest       # read from beginning if no offset exists
+      auto-offset-reset: earliest # read from beginning if no offset exists
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:

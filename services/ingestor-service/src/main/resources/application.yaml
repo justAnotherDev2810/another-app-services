@@ -1,7 +1,14 @@
 ANOTHER_SERVICE_ENDPOINT: http://localhost:8091
 
 server:
-  port: 8092   # another-service is on 8091, ingestor on 8092
+  port: 8092 # another-service is on 8091, ingestor on 8092
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
 
 spring:
   application:
