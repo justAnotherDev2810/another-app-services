@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @FeignClient(
         name = "another-service-client",
-        url = "${clients.another-service.base-url}"
+        url = "${clients.another-service.url}"
 )
 public interface AnotherServiceClient {
  

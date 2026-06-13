@@ -3,7 +3,6 @@ package com.microservice.ingestor.kafka;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservice.ingestor.config.kafkaConfig;
 import com.microservice.ingestor.dto.CloudEventDto;
@@ -28,16 +27,26 @@ public class kafkaProducer {
      * Resolves the Kafka topic from CloudEvent type and publishes the data payload.
      *
      * CloudEvent type "com.microservice.user.create" → topic "user.create"
+     * 
+     * @throws Exception
      */
-    public void publish(CloudEventDto event) throws JsonProcessingException {
+    public void publish(CloudEventDto event) throws Exception {
         String topic = resolveTopic(event.getType());
+        String id = event.getId();
+
+        if (id == null) {
+            throw new Exception("No Id provided");
+        } else if (topic == null) {
+            throw new Exception("No topic found for event type");
+        }
+
         // Serialize only the "data" field — that's what the consumer needs
         String payload = objectMapper.writeValueAsString(event.getData());
 
         log.info("[PRODUCER] Publishing to topic '{}' | eventId='{}' | source='{}'",
-                topic, event.getId(), event.getSource());
+                topic, id, event.getSource());
 
-        kafkaTemplate.send(topic, event.getId(), payload);
+        kafkaTemplate.send(topic, id, payload);
 
         log.info("[PRODUCER] Successfully published to topic '{}'", topic);
     }
