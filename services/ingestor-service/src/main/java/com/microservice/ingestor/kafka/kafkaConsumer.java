@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservice.ingestor.client.AnotherServiceClient;
 import com.microservice.ingestor.config.kafkaConfig;
-import com.microservice.ingestor.dto.UserDto;
+import com.microservice.job.api.dto.UserDto;
+import com.microservice.job.client.AnotherServiceClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,8 @@ public class kafkaConsumer {
 
             // Call another-service via HTTP client
             UserDto created = anotherServiceClient.createUser(userDto);
-            log.info("[CONSUMER] Successfully created user via another-service: {}", created);
+            log.info("[CONSUMER] Successfully created user via another-service: {}",
+                    created);
 
         } catch (JsonProcessingException e) {
             log.error("[CONSUMER] Failed to deserialize message: {}", message, e);

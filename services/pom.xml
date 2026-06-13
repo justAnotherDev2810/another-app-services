@@ -17,6 +17,7 @@
 
     <modules>
         <module>another-service</module>
+        <module>job-service</module> 
         <module>ingestor-service</module> 
     </modules>
 
