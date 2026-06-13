@@ -1,7 +1,7 @@
 ANOTHER_SERVICE_ENDPOINT: http://localhost:8091
 
 server:
-  port: 8092 # another-service is on 8091, ingestor on 8092
+  port: ${SERVER_PORT:8092} # another-service is on 8091, ingestor on 8092
 
 springdoc:
   api-docs:
@@ -12,10 +12,12 @@ springdoc:
 
 spring:
   application:
-    name: ingestor-service
+    name: ${SPRING_APPLICATION_NAME:ingestor-service}
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    # In docker-compose: KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    # Locally: falls back to localhost:9092
     consumer:
       group-id: ingestor-group
       auto-offset-reset: earliest
@@ -30,4 +32,4 @@ spring:
 clients:
   another-service:
     name: another-service
-    url: ${ANOTHER_SERVICE_ENDPOINT}
+    url: ${ANOTHER_SERVICE_ENDPOINT:http://localhost:8091}

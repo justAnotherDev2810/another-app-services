@@ -2,28 +2,67 @@ version: '3.8'
 
 services:
 
+  # ── PostgreSQL ────────────────────────────────────────────────
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: justanotherapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2810
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d justanotherapp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Flyway Migrations ─────────────────────────────────────────
+  flyway-migrations:
+    build:
+      context: ./database-migrations
+      dockerfile: Dockerfile
+    container_name: flyway-migrations
+    environment:
+      ENV: dev
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: justanotherapp
+      DB_USERNAME: postgres
+      DB_PASSWORD: 2810
+      ANOTHER_SERVICE_SCHEMA: app_schema_users_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Kafka ─────────────────────────────────────────────────────
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_INTERNAL://0.0.0.0:29092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
     healthcheck:
-      test: [ "CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list" ]
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
       interval: 10s
       timeout: 10s
       retries: 5
 
+  # ── Kafka UI ──────────────────────────────────────────────────
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -31,7 +70,50 @@ services:
       - "8080:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092 # ← internal port, not 9092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     depends_on:
       kafka:
         condition: service_healthy
+
+  # ── another-service ───────────────────────────────────────────
+  another-service:
+    image: another-service:latest
+    container_name: another-service
+    restart: always
+    ports:
+      - "8091:8091"
+    environment:
+      SPRING_APPLICATION_NAME: another-service
+      SERVER_PORT: 8091
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/justanotherapp
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: 2810
+      POSTGRES_SCHEMA: app_schema_users_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      flyway-migrations:
+        condition: service_completed_successfully
+    command: ["java", "-jar", "app.jar"]
+
+  # ── ingestor-service ──────────────────────────────────────────
+  ingestor-service:
+    image: ingestor-service:latest
+    container_name: ingestor-service
+    restart: always
+    ports:
+      - "8092:8092"
+    environment:
+      SPRING_APPLICATION_NAME: ingestor-service
+      SERVER_PORT: 8092
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      CLIENTS_ANOTHER_SERVICE_BASE_URL: http://another-service:8091
+    depends_on:
+      kafka:
+        condition: service_healthy
+      another-service:
+        condition: service_started
+    command: ["java", "-jar", "app.jar"]
+
+volumes:
+  postgres_data:

@@ -1,5 +1,7 @@
+POSTGRES_SCHEMA: app_schema_users_service
+
 server:
-  port: 8091
+  port: ${SERVER_PORT:8091}
 
 springdoc:
   api-docs:
@@ -9,20 +11,27 @@ springdoc:
     operations-sorter: alpha
 
 spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:another-service}
   datasource:
-    url: jdbc:postgresql://localhost:5432/justanotherapp
-    username: postgres
-    password: 2810
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/justanotherapp}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:2810}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update # creates/updates tables on startup
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
+        default_schema: ${POSTGRES_SCHEMA}
         # ✅ Fixed: dialect goes here, not under spring.jpa.hibernate
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+  flyway:
+    enabled: false
 
   kafka:
     bootstrap-servers: localhost:9092 # where your Kafka broker will run (Docker)
