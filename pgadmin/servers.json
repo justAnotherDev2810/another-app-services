@@ -1,0 +1,15 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "justanotherapp",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "justanotherapp",
+            "Username": "postgres",
+            "Password": "2810",
+            "SSLMode": "prefer",
+            "PassFile": "/pgpass"
+        }
+    }
+}
