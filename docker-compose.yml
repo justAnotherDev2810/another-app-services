@@ -77,7 +77,13 @@ services:
 
   # ── another-service ───────────────────────────────────────────
   another-service:
-    image: another-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+      args:
+        SERVICE_PATH: another-service
+        JAR_NAME: another-service-0.0.1-SNAPSHOT
     container_name: another-service
     restart: always
     ports:
@@ -98,7 +104,13 @@ services:
 
   # ── ingestor-service ──────────────────────────────────────────
   ingestor-service:
-    image: ingestor-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+      args:
+        SERVICE_PATH: ingestor-service
+        JAR_NAME: ingestor-service-0.0.1-SNAPSHOT
     container_name: ingestor-service
     restart: always
     ports:
