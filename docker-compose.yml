@@ -7,7 +7,7 @@ services:
     image: postgres:16
     container_name: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432" 
     environment:
       POSTGRES_DB: justanotherapp
       POSTGRES_USER: postgres
@@ -119,7 +119,7 @@ services:
       SPRING_APPLICATION_NAME: ingestor-service
       SERVER_PORT: 8092
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      CLIENTS_ANOTHER_SERVICE_BASE_URL: http://another-service:8091
+      ANOTHER_SERVICE_ENDPOINT: http://another-service:8091
     depends_on:
       kafka:
         condition: service_healthy

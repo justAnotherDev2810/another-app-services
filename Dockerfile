@@ -13,14 +13,21 @@ ARG JAR_NAME
 FROM eclipse-temurin:${JAVA_VERSION}-jdk AS base-builder
 WORKDIR /build
 
-# Copy only what's needed to resolve dependencies first (better layer caching)
+# Copy root + parent poms first (better layer caching)
 COPY .mvn .mvn
 COPY mvnw mvnw
 COPY pom.xml pom.xml
 COPY services/pom.xml services/pom.xml
-COPY services/job-service services/job-service
 
 RUN chmod +x mvnw
+
+# Copy ALL service poms (not source) so Maven's reactor can resolve
+# the full <modules> list declared in services/pom.xml.
+# Without this, Maven fails immediately because it can't find
+# another-service/ingestor-service folders even though we don't build them yet.
+COPY services/another-service/pom.xml services/another-service/pom.xml
+COPY services/ingestor-service/pom.xml services/ingestor-service/pom.xml
+COPY services/job-service services/job-service
 
 # Build + install job-service (job-api + job-client) only
 # -am also builds any required ancestor modules

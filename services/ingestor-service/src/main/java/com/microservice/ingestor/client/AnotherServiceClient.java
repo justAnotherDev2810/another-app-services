@@ -23,7 +23,7 @@ public class AnotherServiceClient {
 
     private final WebClient.Builder webClientBuilder;
 
-    @Value("${clients.another-service.base-url}")
+    @Value("${clients.another-service.url}")
     private String anotherServiceBaseUrl;
 
     /**
