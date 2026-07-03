@@ -161,8 +161,6 @@ justanotherapp/
 |---|---|---|
 | `SERVER_PORT` | `8091` | `another-service` HTTP port |
 | `POSTGRES_URL` | `jdbc:postgresql://localhost:5432/justanotherapp` | PostgreSQL JDBC URL |
-| `POSTGRES_USERNAME` | `postgres` | DB user |
-| `POSTGRES_PASSWORD` | `2810` | DB password |
 | `POSTGRES_SCHEMA` | — | Schema name (set in docker-compose to `app_schema_users_service`) |
 | `SPRING_APPLICATION_NAME` | `another-service` | Spring app name |
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker address |
