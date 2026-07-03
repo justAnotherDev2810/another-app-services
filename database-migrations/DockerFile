@@ -1,0 +1,20 @@
+FROM flyway/flyway:10.10.0
+
+# Copy base config and environment-specific properties
+COPY config/flyway-base.conf /flyway/conf/flyway-base.conf
+COPY config/dev.properties /flyway/conf/dev.properties
+COPY config/prod.properties /flyway/conf/prod.properties
+
+# Copy all service migration scripts
+# Each service has its own subfolder — Flyway only scans the one it's told to
+COPY migrations/ /flyway/sql/
+
+# Copy and set entrypoint script
+COPY scripts/migrate.sh /flyway/scripts/migrate.sh
+
+USER root
+RUN chmod +x /flyway/scripts/migrate.sh
+
+# Override default Flyway entrypoint with our script
+# Script runs migrations per service then exits cleanly
+ENTRYPOINT ["/flyway/scripts/migrate.sh"]
