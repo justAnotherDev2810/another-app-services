@@ -13,8 +13,11 @@ COPY migrations/ /flyway/sql/
 COPY scripts/migrate.sh /flyway/scripts/migrate.sh
 
 USER root
-RUN chmod +x /flyway/scripts/migrate.sh
 
-# Override default Flyway entrypoint with our script
-# Script runs migrations per service then exits cleanly
+# Fix Windows line endings and set permissions
+RUN apt-get update && apt-get install -y dos2unix \
+    && dos2unix /flyway/scripts/migrate.sh \
+    && chmod +x /flyway/scripts/migrate.sh \
+    && rm -rf /var/lib/apt/lists/*
+
 ENTRYPOINT ["/flyway/scripts/migrate.sh"]

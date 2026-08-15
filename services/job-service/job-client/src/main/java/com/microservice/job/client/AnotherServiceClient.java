@@ -4,7 +4,7 @@ import com.microservice.job.api.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
- 
+
 /**
  * Feign client interface for calling another-service.
  *
@@ -15,16 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * url pulled from yml — never hardcoded.
  * In the consuming service's application.yml:
- *   clients:
- *     another-service:
- *       base-url: http://localhost:8091
+ * clients:
+ * another-service:
+ * base-url: http://localhost:8091
  */
-@FeignClient(
-        name = "another-service-client",
-        url = "${clients.another-service.url}"
-)
+@FeignClient(name = "another-service-client", url = "${clients.another-service.url}")
 public interface AnotherServiceClient {
- 
+
     @PostMapping("/api/user")
     UserDto createUser(@RequestBody UserDto userDto);
 }
