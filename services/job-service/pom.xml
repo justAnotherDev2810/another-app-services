@@ -21,6 +21,7 @@
     <modules>
         <module>job-api</module>
         <module>job-client</module>
+        <module>job-common</module>
     </modules>
 
 </project>
