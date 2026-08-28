@@ -1,6 +1,6 @@
 package com.microservice.justanotherapp.service;
 
-import com.microservice.justanotherapp.dto.UserDto;
+import com.microservice.job.api.dto.UserDto;
 
 import java.util.List;
 
