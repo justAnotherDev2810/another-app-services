@@ -1,6 +1,7 @@
 package com.microservice.justanotherapp.controller;
 
-import com.microservice.justanotherapp.dto.UserDto;
+import com.microservice.job.api.dto.UserDto;
+import com.microservice.job.common.utils.LogUtils;
 import com.microservice.justanotherapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +30,23 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody UserDto dto) {
+        LogUtils.startLog("UserController", "create");
+        LogUtils.logPayload("UserController", dto.toString());
         UserDto created = userService.create(dto);
         return ResponseEntity.created(URI.create("/api/users/" + created.getId())).body(created);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody UserDto dto) {
+        LogUtils.startLog("UserController", "update");
+        LogUtils.logPayload("UserController", dto.toString());
         return ResponseEntity.ok(userService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        LogUtils.startLog("UserController", "delete");
+        LogUtils.logPayload("UserController", "ID: " + id);
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
