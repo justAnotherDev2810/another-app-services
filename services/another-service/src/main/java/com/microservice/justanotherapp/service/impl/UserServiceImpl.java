@@ -1,6 +1,7 @@
 package com.microservice.justanotherapp.service.impl;
 
-import com.microservice.justanotherapp.dto.UserDto;
+import com.microservice.job.api.dto.UserDto;
+import com.microservice.job.common.utils.LogUtils;
 import com.microservice.justanotherapp.entity.User;
 import com.microservice.justanotherapp.exception.GenericException;
 import com.microservice.justanotherapp.repository.UserRepository;
@@ -25,28 +26,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> findAll() {
-        return userRepository.findAll()
+        LogUtils.startLog("UserServiceImpl", "findAll");
+        List<UserDto> users = userRepository.findAll()
                 .stream()
-                .map(UserDto::fromEntity)
+                .map(User::fromEntity)
                 .collect(Collectors.toList());
+        LogUtils.logInfoMessage("Found " + users.size() + " users");
+        LogUtils.endLog("UserServiceImpl", "findAll");
+        return users;
     }
 
     @Override
     public UserDto findById(Long id) {
+        LogUtils.startLog("UserServiceImpl", "findById");
         User a = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        return UserDto.fromEntity(a);
+        return User.fromEntity(a);
     }
 
     @Override
     public UserDto create(UserDto dto) {
+        LogUtils.startLog("UserServiceImpl", "create");
         try {
-            User entity = dto.toEntity();
+            User entity = User.toEntity(dto);
+            LogUtils.logInfoMessage("Creating user with username: " + entity.getUserName());
             // ensure id is null so JPA will generate
             entity.setId(null);
             User saved = userRepository.save(entity);
-            return UserDto.fromEntity(saved);
+            LogUtils.logInfoMessage("User created with ID: " + saved.getId());
+            LogUtils.endLog("UserServiceImpl", "create");
+            return User.fromEntity(saved);
         } catch (DataIntegrityViolationException e) {
+            LogUtils.errorMessage("UserServiceImpl", "create", "DataIntegrityViolationException: " + e.getMessage());
+            LogUtils.endLog("UserServiceImpl", "create");
             throw new GenericException(
                     "User already exists with username: " + dto.getUsername());
         }
@@ -54,6 +66,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(Long id, UserDto dto) {
+        LogUtils.startLog("UserServiceImpl", "update");
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -62,14 +75,20 @@ public class UserServiceImpl implements UserService {
         existing.setRole(dto.getRole());
 
         User saved = userRepository.save(existing);
-        return UserDto.fromEntity(saved);
+        LogUtils.logInfoMessage("User updated with ID: " + saved.getId());
+        LogUtils.endLog("UserServiceImpl", "update");
+        return User.fromEntity(saved);
     }
 
     @Override
     public void delete(Long id) {
+        LogUtils.startLog("UserServiceImpl", "delete");
         if (!userRepository.existsById(id)) {
+            LogUtils.errorMessage("UserServiceImpl", "delete", "User not found with ID: " + id);
+            LogUtils.endLog("UserServiceImpl", "delete");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         userRepository.deleteById(id);
+        LogUtils.endLog("UserServiceImpl", "delete");
     }
 }
