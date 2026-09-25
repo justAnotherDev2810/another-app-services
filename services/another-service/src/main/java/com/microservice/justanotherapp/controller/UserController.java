@@ -17,28 +17,28 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<UserDto>> getAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    @PostMapping
+    @PostMapping("/createUser")
     public ResponseEntity<UserDto> create(@RequestBody UserDto dto) {
         UserDto created = userService.create(dto);
         return ResponseEntity.created(URI.create("/api/users/" + created.getId())).body(created);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/modify/{id}")
     public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody UserDto dto) {
         return ResponseEntity.ok(userService.update(id, dto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
