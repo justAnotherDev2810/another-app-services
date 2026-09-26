@@ -40,13 +40,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
      * Returns Object[] { BigDecimal total, Long count }.
      */
     @Query("""
-            SELECT COALESCE(SUM(e.amount), 0), COUNT(e)
-            FROM Expense e
-            WHERE (:categoryId IS NULL OR e.categoryId = :categoryId)
-              AND (:startDate   IS NULL OR e.expenseDate >= :startDate)
-              AND (:endDate     IS NULL OR e.expenseDate <= :endDate)
-            """)
-    Object[] aggregateFiltered(
+        SELECT COALESCE(SUM(e.amount), 0), COUNT(e)
+        FROM Expense e
+        WHERE (:categoryId IS NULL OR e.categoryId = :categoryId)
+          AND (:startDate IS NULL OR e.expenseDate >= :startDate)
+          AND (:endDate IS NULL OR e.expenseDate <= :endDate)
+        """)
+    Object aggregateFiltered(
             @Param("categoryId") Long categoryId,
             @Param("startDate")  LocalDate startDate,
             @Param("endDate")    LocalDate endDate

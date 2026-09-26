@@ -84,11 +84,11 @@ public class ExpenseServiceImpl implements ExpenseService {
         log.info("[ExpenseService] Aggregating expenses — categoryId={} startDate={} endDate={}",
                 categoryId, startDate, endDate);
 
-        Object[] result = expenseRepository.aggregateFiltered(categoryId, startDate, endDate);
+        Object[] row = (Object[]) expenseRepository.aggregateFiltered(categoryId, startDate, endDate);
 
         return ExpenseTotalDto.builder()
-                .total((BigDecimal) result[0])
-                .count((Long) result[1])
+                .total((BigDecimal) row[0])
+                .count((Long) row[1])
                 .build();
     }
 
