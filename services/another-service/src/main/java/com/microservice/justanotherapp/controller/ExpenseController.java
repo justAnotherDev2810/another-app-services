@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -48,7 +49,7 @@ public class ExpenseController {
 
     // ── GET /api/expenses ─────────────────────────────────────────────────
     @GetMapping("/all")
-    public ResponseEntity<Page<ExpenseResponseDto>> findAll(
+    public ResponseEntity<List<ExpenseResponseDto>> findAll(
 
             @RequestParam(required = false) Long categoryId,
 
@@ -64,7 +65,7 @@ public class ExpenseController {
         log.info("[ExpenseController] GET /api/expenses — categoryId={} startDate={} endDate={} page={}",
                 categoryId, startDate, endDate, pageable.getPageNumber());
 
-        return ResponseEntity.ok(expenseService.findAll(categoryId, startDate, endDate, pageable));
+        return ResponseEntity.ok(expenseService.findAll(categoryId, startDate, endDate));
     }
 
     // ── GET /api/expenses/total ───────────────────────────────────────────

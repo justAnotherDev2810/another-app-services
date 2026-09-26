@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
@@ -32,6 +33,26 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             @Param("startDate")  LocalDate startDate,
             @Param("endDate")    LocalDate endDate,
             Pageable pageable
+    );
+
+
+    /**
+     * Paginated list with optional filters.
+     * All filter params are nullable — when null they are ignored (no WHERE clause added).
+     * Uses JPQL rather than Criteria API for readability.
+     */
+    @Query("""
+            SELECT new com.microservice.job.api.dto.ExpenseDto(e.id, e.userId, e.categoryId, e.amount, e.description, e.expenseDate, e.createdAt)
+            FROM Expense e
+            WHERE (:categoryId IS NULL OR e.categoryId = :categoryId)
+              AND (:startDate   IS NULL OR e.expenseDate >= :startDate)
+              AND (:endDate     IS NULL OR e.expenseDate <= :endDate)
+            ORDER BY e.expenseDate DESC, e.createdAt DESC
+            """)
+    List<ExpenseDto> findAllFiltered(
+            @Param("categoryId") Long categoryId,
+            @Param("startDate")  LocalDate startDate,
+            @Param("endDate")    LocalDate endDate
     );
 
     /**

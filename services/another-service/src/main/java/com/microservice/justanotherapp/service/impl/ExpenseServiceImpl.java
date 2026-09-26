@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.microservice.justanotherapp.entity.Expense.fromEntity;
 
@@ -60,9 +62,9 @@ public class ExpenseServiceImpl implements ExpenseService {
         return toDto(fromEntity(saved), category.getName());
     }
 
-    @Override
+//    @Override
     @Transactional(readOnly = true)
-    public Page<ExpenseResponseDto> findAll(Long categoryId, LocalDate startDate,
+    public Page<ExpenseResponseDto> findAllPaginated(Long categoryId, LocalDate startDate,
                                              LocalDate endDate, Pageable pageable) {
         log.info("[ExpenseService] Listing expenses — categoryId={} startDate={} endDate={}",
                 categoryId, startDate, endDate);
@@ -76,6 +78,25 @@ public class ExpenseServiceImpl implements ExpenseService {
                             .orElse("Unknown");
                     return toDto(e, categoryName);
                 });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ExpenseResponseDto> findAll(Long categoryId, LocalDate startDate,
+                                            LocalDate endDate) {
+        log.info("[ExpenseService] Listing expenses — categoryId={} startDate={} endDate={}",
+                categoryId, startDate, endDate);
+
+        List<ExpenseDto> allFiltered = expenseRepository
+                .findAllFiltered(categoryId, startDate, endDate);
+        return allFiltered.stream()
+                .map(e -> {
+                    String categoryName = categoryRepository.findById(e.getCategoryId())
+                            .map(Category::getName)
+                            .orElse("Unknown");
+                    return toDto(e, categoryName);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
