@@ -133,6 +133,61 @@ public class OpenApiConfig {
                             .addApiResponse("500", messageResponse("Unexpected server error"))));
             paths.addPathItem("/api/categories", categoriesPath);
 
+            // ── PUT /api/categories/{id} ──────────────────────────────────
+            PathItem categoryByIdPath = paths.getOrDefault("/api/categories/{id}", new PathItem());
+            categoryByIdPath.setPut(new Operation()
+                    .addTagsItem("Categories")
+                    .summary("Update a category name")
+                    .description("""
+                            Updates the name of an existing category.
+                            Returns 404 if the category does not exist.
+                            Returns 409 if the new name collides with an existing category name.
+                            Name comparison is case-insensitive.
+                            """)
+                    .addParametersItem(new Parameter()
+                            .name("id")
+                            .in("path")
+                            .required(true)
+                            .description("Category ID")
+                            .schema(new Schema<>().type("integer")))
+                    .addParametersItem(new Parameter()
+                            .name("name")
+                            .in("query")
+                            .required(true)
+                            .description("New category name (max 100 chars, must not be blank)")
+                            .schema(new Schema<>().type("string").maxLength(100)))
+                    .responses(new ApiResponses()
+                            .addApiResponse("200", jsonResponse("Category updated", CategoryDto.class))
+                            .addApiResponse("400", messageResponse("name is blank or exceeds 100 characters"))
+                            .addApiResponse("404", messageResponse("Category not found"))
+                            .addApiResponse("409", messageResponse("Category name already exists"))
+                            .addApiResponse("500", messageResponse("Unexpected server error"))));
+
+            // ── DELETE /api/categories/{id} ───────────────────────────────
+            categoryByIdPath.setDelete(new Operation()
+                    .addTagsItem("Categories")
+                    .summary("Delete a category")
+                    .description("""
+                            Deletes a category by ID.
+                            Returns 204 on success.
+                            Returns 404 if the category does not exist.
+                            Returns 409 if the category has expenses attached (ON DELETE RESTRICT).
+                            The raw DB constraint is caught and returned as a clean error message.
+                            """)
+                    .addParametersItem(new Parameter()
+                            .name("id")
+                            .in("path")
+                            .required(true)
+                            .description("Category ID")
+                            .schema(new Schema<>().type("integer")))
+                    .responses(new ApiResponses()
+                            .addApiResponse("204", messageResponse("Category deleted"))
+                            .addApiResponse("404", messageResponse("Category not found"))
+                            .addApiResponse("409", messageResponse("Category has expenses attached and cannot be deleted"))
+                            .addApiResponse("500", messageResponse("Unexpected server error"))));
+
+            paths.addPathItem("/api/categories/{id}", categoryByIdPath);
+
             // ── GET /api/user ─────────────────────────────────────────────
             PathItem usersPath = paths.getOrDefault("/api/user", new PathItem());
             usersPath.setGet(new Operation()
@@ -196,4 +251,6 @@ public class OpenApiConfig {
                 .description(description)
                 .schema(new Schema<>().type(type));
     }
+
+
 }

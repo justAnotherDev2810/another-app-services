@@ -13,4 +13,14 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query("SELECT new com.microservice.job.api.dto.CategoryDto(c.id, c.name) FROM Category c")
     List<CategoryDto> findAllCategories();
+
+    /**
+     * Checks whether a category with the given name already exists,
+     * excluding the category with the given id.
+     *
+     * Used on PUT to catch duplicate name collisions before hitting
+     * the DB unique constraint — returns a clean 409 instead of a
+     * raw DataIntegrityViolationException.
+     */
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
 }
