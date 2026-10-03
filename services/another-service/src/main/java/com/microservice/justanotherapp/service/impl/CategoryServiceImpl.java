@@ -23,6 +23,28 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional
+    public CategoryDto create(String name) {
+        log.info("[CategoryService] Creating category name={}", name);
+
+        // Pre-check for duplicate name before hitting the DB unique constraint —
+        // returns a clean 409 instead of a raw DataIntegrityViolationException.
+        // Case-insensitive check matches the update() convention.
+        if (categoryRepository.existsByNameIgnoreCase(name)) {
+            throw new DuplicateResourceException("Category", "name", name);
+        }
+
+        Category saved = categoryRepository.save(
+                Category.builder()
+                        .name(name)
+                        .build()
+        );
+
+        log.info("[CategoryService] Created category id={}", saved.getId());
+        return Category.fromEntity(saved);
+    }
+
+    @Override
     public List<CategoryDto> getAllCategories() {
         LogUtils.startLog("CategoryServiceImpl", "findAllCategories");
         LogUtils.logInfoMessage("[CategoryService] Fetching all categories");

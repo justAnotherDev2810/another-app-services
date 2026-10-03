@@ -15,6 +15,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<CategoryDto> findAllCategories();
 
     /**
+     * Used on CREATE — checks if any category with this name already exists.
+     * Case-insensitive.
+     */
+    boolean existsByNameIgnoreCase(String name);
+
+    /**
      * Checks whether a category with the given name already exists,
      * excluding the category with the given id.
      *
